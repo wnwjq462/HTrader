@@ -8,8 +8,10 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 
+#미리 만들어 놓은 UI 불러오기
 form_class = uic.loadUiType("htrader.ui")[0]
 
+#키움 API와 연결하고 대부분의 기능이 구현되어 있는 Main Class
 class MyWindow(QMainWindow, form_class):
     def __init__(self):
         super().__init__()
@@ -53,14 +55,15 @@ class MyWindow(QMainWindow, form_class):
         self.load_buy_sell_list()
 
 
-        #self.kiwoom._set_real_reg("6000", "8121773611", "8019", "0")
+        #self.kiwoom._set_real_reg("6000", "8121773611", "8019", "0") //실시간 정보 확인
 
 
-
+    #프로그램 상에서 수동 주문하는 함수 -> 주문 정보를 DB에 저장
     def send_order(self):
         order_type_lookup = {'신규매수': 1, '신규매도': 2, '매수취소': 3, '매도취소' : 4}
         hoga_lookup = {'지정가' : "00", '시장가' : "03"}
 
+        #프로그램 상에서 텍스트 박스 상의 정보를 이용하여 주문
         account = self.comboBox.currentText()
         order_type = self.comboBox_2.currentText()
         code = self.lineEdit.text()
@@ -73,6 +76,7 @@ class MyWindow(QMainWindow, form_class):
         now = datetime.now()
         current_date = str(now.year)+'-'+str(now.month)+'-'+str(now.day)
 
+        #구매 정보 DB에 저장
         if order_type == '신규매수' :
             sql = "INSERT INTO buy_inform VALUES("
             sql = sql + "'" +current_date + "'"+ "," + "'"+ current_time + "'"+"," + "'"+name + "'"+"," + "'"+code + "'"+"," + "'수동주문'" + ")"
@@ -80,7 +84,7 @@ class MyWindow(QMainWindow, form_class):
             self.con.commit()
         elif order_type == '신규매도' :
             sql = "INSERT INTO sell_inform VALUES("
-            #buy_inform 에서 데이터가져오기
+            #buy_inform 에서 데이터가져오기  // 매수 정보에서 불러온 정보와 더불어 매도 정보에 저장
             df = pd.read_sql("SELECT * FROM buy_inform",self.con,index_col = None)
             df_num = len(df)
 
@@ -129,24 +133,26 @@ class MyWindow(QMainWindow, form_class):
 
         self.statusbar.showMessage(state_msg + " | " + time_msg)
 
+    #종목번호를 누르면 네이버,다음 증권 정보를 불러옴
     def link_btn(self):
         naver_url = "https://finance.naver.com/item/fchart.nhn?code="
         daum_url = "https://finance.daum.net/quotes/"
         sender = self.sender()
         code = sender.text()
-        daum_url = daum_url + code + "#chart"
+        daum_url = daum_url + "A"+ code + "#chart"
         webbrowser.open_new(daum_url)
         code = re.findall('\d+', code)[0]
         naver_url = naver_url + code
         webbrowser.open_new(naver_url)
 
+    #현재 보유하고 있는 주식과 잔고를 보여주는 함수
     def check_balance(self):
         self.kiwoom.reset_opw00018_output()
         account_number = self.kiwoom.get_login_info("ACCNO")
         account_number = account_number.split(';')[0]
 
 
-        #opw00018
+        #opw00018 - 각 종목에 대한 비중, 매입가, 평가액 등을 요청
         self.kiwoom.set_input_value("계좌번호", account_number)
         self.kiwoom.comm_rq_data("opw00018_req", "opw00018", 0, "2000")
 
@@ -155,7 +161,7 @@ class MyWindow(QMainWindow, form_class):
             self.kiwoom.set_input_value("계좌번호", account_number)
             self.kiwoom.comm_rq_data("opw00018_req", "opw00018", 2, "2000")
 
-        #opw00001
+        #opw00001 - 이틀 뒤의 예수금을 보여줌
         self.kiwoom.set_input_value("계좌번호", account_number)
         self.kiwoom.comm_rq_data("opw00001_req","opw00001",0,"2000")
 
@@ -194,6 +200,7 @@ class MyWindow(QMainWindow, form_class):
         if self.checkBox.isChecked():
             self.check_balance()
 
+    #매수해야 하는 목록, 매도해야 하는 목록을 불러와 표로 보여주는 함수
     def load_buy_sell_list(self):
         f = open("buy_list.txt",'rt', encoding='UTF8')
         buy_list = f.readlines()
@@ -242,6 +249,7 @@ class MyWindow(QMainWindow, form_class):
 
         self.tableWidget_3.resizeRowsToContents()
 
+    #현재 작성되어 있는 매수해야하는 목록과 매도해야 하는 목록을 바탕으로 매수,매도 진행
     def trade_stocks(self):
         hoga_lookup = {'지정가' : "00", '시장가': "03"}
 
