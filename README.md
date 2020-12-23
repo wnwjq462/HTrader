@@ -19,9 +19,11 @@ HSeek 과 연결된 프로젝트이다.
 DataBase 이름 HBase
 
 buy_inform table - 매수한 종목들에 대한 기록을 담고 있는 테이블
+
 column		매수날짜 매수시각	종목명		종목코드	매수근거
 
 sell_inform table - 매도한 종목들에 대한 기록을 담고 있는 테이블
+
 column 매수날짜 매수시각 매도시각 종목명 종목코드 보유량 보유비중 매입가 현재가 평가손익 수익률 매수근거 매도근거
 
 * Kiwoom.py 
