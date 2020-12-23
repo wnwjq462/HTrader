@@ -91,7 +91,7 @@ reset_opw00018_output() : 데이터를 가져오기위한 딕셔너리를 초기
 
 * HTrader.py
 
-MyWindow 
+MyWindow 클래스
 
 send_order(self) : 프로그램에서 텍스트 박스 정보를 이용하여 수동 주문하고, 주문 정보를 데이터 베이스에 저장
 
