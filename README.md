@@ -24,7 +24,7 @@ column		매수날짜 매수시각	종목명		종목코드	매수근거
 sell_inform table - 매도한 종목들에 대한 기록을 담고 있는 테이블
 column 매수날짜 매수시각 매도시각 종목명 종목코드 보유량 보유비중 매입가 현재가 평가손익 수익률 매수근거 매도근거
 
-Kiwoom.py 
+* Kiwoom.py 
 
 Kiwoom 클래스 
 
@@ -86,7 +86,10 @@ _opw0001(self,rqname,trcode) : d+2 추정 예수금의 데이터를 가져온다
 reset_opw00018_output() : 데이터를 가져오기위한 딕셔너리를 초기화한다.
 
 
-HTrader.py
+
+
+
+* HTrader.py
 
 MyWindow 
 
